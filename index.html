@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Tassie Trip</title>
+<meta name="description" content="Swipe through what's on in Tasmania this January and tell Lyle what you're keen on.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0f2a28">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f2a28'/%3E%3Cpath d='M14 46 28 20l8 14 5-7 9 19z' fill='%23e8743b'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,800&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#0f2a28; --bg2:#163a37; --ink:#f4efe6; --ink-soft:#c9d3cf; --ink-faint:#8fa39e;
+  --lichen:#e8743b; --lichen-soft:rgba(232,116,59,.30);
+  --keen:#3fbf7f; --maybe:#e8b93b; --nope:#e05a4f;
+  --card-r:22px; --gut:16px;
+  --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overscroll-behavior:none}
+body{min-height:100dvh}
+button{font:inherit;color:inherit}
+h1,h2{font-family:Fraunces,Georgia,serif;font-weight:800;letter-spacing:-.01em;margin:0;text-wrap:balance}
+.app{max-width:520px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;padding:calc(var(--safe-t) + 14px) var(--gut) calc(var(--safe-b) + 16px)}
+.top{display:flex;align-items:center;gap:10px;min-height:34px;margin-bottom:10px}
+.back{background:none;border:0;color:var(--ink-soft);font-size:15px;padding:6px 8px 6px 0;cursor:pointer;visibility:hidden}
+.back.show{visibility:visible}
+.bar{flex:1;height:6px;border-radius:9px;background:rgba(255,255,255,.12);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--lichen);border-radius:9px;transition:width .35s ease}
+.screen{display:none;flex:1;flex-direction:column;animation:fade .3s ease}
+.screen.on{display:flex}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--lichen);margin-bottom:8px}
+.lead{color:var(--ink-soft);font-size:16px;line-height:1.5;margin:10px 0 0}
+.q h2{font-size:30px;line-height:1.1}
+.spacer{flex:1}
+.cta{display:block;width:100%;border:0;border-radius:16px;padding:17px;font-weight:700;font-size:17px;background:var(--lichen);color:#1b0f08;cursor:pointer;margin-top:18px}
+.cta:disabled{opacity:.35;cursor:default}
+.ghost{display:block;width:100%;background:none;border:0;color:var(--ink-faint);padding:12px;font-size:14px;cursor:pointer}
+
+/* intro */
+.hero{position:relative;border-radius:var(--card-r);overflow:hidden;flex:1;min-height:52vh;display:flex;align-items:flex-end;background:#244 center/cover}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 35%,rgba(8,22,21,.92))}
+.hero .txt{position:relative;z-index:1;padding:22px}
+.hero h1{font-size:40px;line-height:1.02}
+.hero p{margin:10px 0 0;color:#e6ece9;font-size:16px;line-height:1.45}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.meta span{font-size:12.5px;background:rgba(255,255,255,.14);padding:5px 10px;border-radius:99px}
+
+/* chips */
+.chips{display:flex;flex-direction:column;gap:10px;margin-top:22px}
+.chips.row{flex-direction:row;flex-wrap:wrap}
+.chips.row .chip{flex:1 1 40%}
+.chip{border:2px solid rgba(255,255,255,.14);background:var(--bg2);border-radius:16px;padding:16px 16px;text-align:left;cursor:pointer;font-size:16.5px;font-weight:600;line-height:1.3;transition:border-color .15s,background .15s,transform .1s}
+.chip small{display:block;font-weight:400;font-size:13.5px;color:var(--ink-soft);margin-top:4px;line-height:1.4}
+.chip:active{transform:scale(.98)}
+.chip.sel{border-color:var(--lichen);background:var(--lichen-soft)}
+.chip.sel::before{content:"✓ ";color:var(--lichen)}
+input[type=text],textarea{width:100%;background:var(--bg2);border:2px solid rgba(255,255,255,.14);border-radius:14px;color:var(--ink);font:inherit;font-size:16px;padding:14px;margin-top:10px}
+textarea{min-height:92px;resize:vertical}
+input:focus,textarea:focus{outline:none;border-color:var(--lichen)}
+label.fl{display:block;font-weight:600;margin-top:20px;font-size:15.5px}
+
+/* timeline */
+.tl{margin-top:20px;display:flex;flex-direction:column;gap:10px}
+.wk{position:relative;border:2px solid rgba(255,255,255,.14);background:var(--bg2);border-radius:16px;padding:12px 14px 12px;cursor:pointer;text-align:left;width:100%}
+.wk.sel{border-color:var(--keen);background:rgba(63,191,127,.13)}
+.wk .wh{display:flex;justify-content:space-between;align-items:center;font-weight:700;font-size:15.5px}
+.wk .tick{width:24px;height:24px;border-radius:50%;border:2px solid rgba(255,255,255,.3);display:grid;place-items:center;font-size:14px}
+.wk.sel .tick{background:var(--keen);border-color:var(--keen);color:#05170e}
+.wk .days{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-top:9px}
+.wk .d{height:22px;border-radius:6px;background:rgba(255,255,255,.07);font-size:10.5px;color:var(--ink-faint);display:grid;place-items:center;position:relative}
+.wk .d.ev{background:var(--lichen);color:#1b0f08;font-weight:700}
+.wk .evs{margin-top:8px;font-size:12.5px;color:var(--ink-soft);line-height:1.5}
+.wk .evs b{color:var(--lichen);font-weight:600}
+
+/* deck */
+.deckhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.deckhead h2{font-size:24px}
+.count{font-size:13px;color:var(--ink-faint);white-space:nowrap}
+.deck{position:relative;flex:1;min-height:420px;margin-top:12px;touch-action:none}
+.card{position:absolute;inset:0;border-radius:var(--card-r);overflow:hidden;background:#1f3a38 center/cover no-repeat;box-shadow:0 10px 30px rgba(0,0,0,.35);will-change:transform;user-select:none;-webkit-user-select:none;cursor:grab}
+.card.behind{transform:scale(.95) translateY(12px);filter:brightness(.7)}
+.card::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.25) 0,rgba(0,0,0,0) 22%,rgba(0,0,0,0) 42%,rgba(6,18,17,.94) 100%);pointer-events:none}
+.card .ct{position:absolute;left:0;right:0;bottom:0;padding:20px 18px 18px;z-index:2}
+.card .tag{display:inline-block;font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--lichen);color:#1b0f08;padding:4px 9px;border-radius:7px}
+.card .tag.reg{background:rgba(255,255,255,.18);color:#fff}
+.card h3{font-family:Fraunces,Georgia,serif;font-size:29px;line-height:1.05;margin:9px 0 0;font-weight:800}
+.card p{margin:8px 0 0;font-size:15px;line-height:1.45;color:#e9efec}
+.card .acc{margin-top:8px;font-size:13px;color:var(--ink-soft)}
+.card .cred{position:absolute;top:10px;right:10px;z-index:3;font-size:10.5px;color:rgba(255,255,255,.8);background:rgba(0,0,0,.35);padding:3px 8px;border-radius:99px;text-decoration:none;max-width:70%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stamp{position:absolute;top:26px;z-index:3;font-family:Fraunces,serif;font-weight:800;font-size:30px;padding:4px 12px;border:4px solid;border-radius:10px;opacity:0;transform:rotate(-12deg);pointer-events:none}
+.stamp.k{left:20px;color:var(--keen);border-color:var(--keen)}
+.stamp.n{right:20px;color:var(--nope);border-color:var(--nope);transform:rotate(12deg)}
+.stamp.m{left:50%;top:auto;bottom:46%;transform:translateX(-50%);color:var(--maybe);border-color:var(--maybe)}
+.btns{display:flex;justify-content:center;align-items:center;gap:18px;margin-top:16px}
+.rb{border:0;border-radius:50%;display:grid;place-items:center;cursor:pointer;background:var(--bg2);box-shadow:0 4px 14px rgba(0,0,0,.3);transition:transform .1s}
+.rb:active{transform:scale(.92)}
+.rb.big{width:68px;height:68px}
+.rb.sm{width:52px;height:52px}
+.rb svg{width:28px;height:28px}
+.rb.nope{color:var(--nope)} .rb.maybe{color:var(--maybe)} .rb.keen{color:var(--keen)}
+.btnlbl{display:flex;justify-content:center;gap:18px;margin-top:6px;font-size:11.5px;color:var(--ink-faint)}
+.btnlbl span{width:68px;text-align:center}
+.btnlbl span.s{width:52px}
+.deckfoot{display:flex;justify-content:space-between;margin-top:6px}
+.deckfoot button{background:none;border:0;color:var(--ink-faint);font-size:13.5px;padding:8px 4px;cursor:pointer}
+.hint{font-size:13px;color:var(--ink-faint);text-align:center;margin-top:8px}
+
+/* done */
+.top5{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+.t5{display:flex;gap:12px;align-items:center;background:var(--bg2);border-radius:16px;padding:8px;overflow:hidden}
+.t5 .ph{width:74px;height:74px;border-radius:12px;background:#244 center/cover;flex:none}
+.t5 b{display:block;font-size:16px}
+.t5 span{font-size:13px;color:var(--ink-soft)}
+.t5 .n{font-family:Fraunces,serif;font-size:26px;color:var(--lichen);width:26px;text-align:center;flex:none}
+.err{color:var(--nope);font-size:14px;margin-top:10px;display:none}
+.credits{font-size:11px;color:var(--ink-faint);line-height:1.6;margin-top:26px}
+.credits a{color:var(--ink-faint)}
+.small{font-size:13.5px;color:var(--ink-faint);margin-top:10px;line-height:1.5}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top"><button class="back" id="back" aria-label="Back">‹ Back</button><div class="bar"><i id="prog"></i></div></div>
+
+  <!-- 0 intro -->
+  <section class="screen on" data-s="intro">
+    <div class="hero" style="background-image:url(img/bayoffires.jpg)">
+      <div class="txt">
+        <div class="eyebrow">January · Tassie</div>
+        <h1>What are you keen on?</h1>
+        <p>Swipe through what's on and where we could go. Right for keen, left for nah. Your answers come straight to Lyle.</p>
+        <div class="meta"><span>About 5 minutes</span><span>No login</span><span>32 cards</span></div>
+      </div>
+    </div>
+    <button class="cta" data-next>Let's go</button>
+  </section>
+
+  <!-- 1 who -->
+  <section class="screen q" data-s="who">
+    <div class="eyebrow">First up</div>
+    <h2>Who's swiping?</h2>
+    <div class="chips row" id="who">
+      <button class="chip" data-v="Vicki">Vicki</button>
+      <button class="chip" data-v="Ayden">Ayden</button>
+    </div>
+    <input type="text" id="whoOther" placeholder="Someone else? Type your name" autocomplete="given-name">
+    <div class="spacer"></div>
+    <button class="cta" data-next id="whoNext" disabled>Next</button>
+  </section>
+
+  <!-- 2 weeks -->
+  <section class="screen q" data-s="weeks">
+    <div class="eyebrow">When</div>
+    <h2>Which weeks could you go?</h2>
+    <p class="lead">Tap every week that works. Orange days have something on.</p>
+    <div class="tl" id="tl"></div>
+    <label class="fl">How long should the trip be?</label>
+    <div class="chips row" id="len">
+      <button class="chip" data-v="About a week">About a week</button>
+      <button class="chip" data-v="10 days">10 days</button>
+      <button class="chip" data-v="Two weeks">Two weeks</button>
+      <button class="chip" data-v="Longer if we can">Longer if we can</button>
+    </div>
+    <button class="cta" data-next id="weeksNext" disabled>Next</button>
+  </section>
+
+  <!-- 3 events deck -->
+  <section class="screen" data-s="events">
+    <div class="deckhead"><h2>What's on</h2><span class="count" id="evCount"></span></div>
+    <div class="deck" id="evDeck"></div>
+    <div class="btns">
+      <button class="rb big nope" data-r="Not for me" aria-label="Not for me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <button class="rb sm maybe" data-r="Maybe" aria-label="Maybe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M9 9a3 3 0 1 1 4 2.8c-.7.3-1 .9-1 1.6V14"/><circle cx="12" cy="18" r=".6" fill="currentColor"/></svg></button>
+      <button class="rb big keen" data-r="Keen" aria-label="Keen"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.7 4.5c2.1 0 3.6 1.2 4.3 2.4.7-1.2 2.2-2.4 4.3-2.4 3.7 0 5.8 3.9 4.3 7.3C19.5 16.4 12 21 12 21z"/></svg></button>
+    </div>
+    <div class="btnlbl"><span>Not for me</span><span class="s">Maybe</span><span>Keen</span></div>
+    <div class="deckfoot"><button data-undo>↶ Undo</button><button data-skip>Skip →</button></div>
+  </section>
+
+  <!-- 4 places deck -->
+  <section class="screen" data-s="places">
+    <div class="deckhead"><h2>Places</h2><span class="count" id="plCount"></span></div>
+    <div class="deck" id="plDeck"></div>
+    <div class="btns">
+      <button class="rb big nope" data-r="Not for me" aria-label="Not for me"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <button class="rb sm maybe" data-r="Maybe" aria-label="Maybe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M9 9a3 3 0 1 1 4 2.8c-.7.3-1 .9-1 1.6V14"/><circle cx="12" cy="18" r=".6" fill="currentColor"/></svg></button>
+      <button class="rb big keen" data-r="Keen" aria-label="Keen"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.7 4.5c2.1 0 3.6 1.2 4.3 2.4.7-1.2 2.2-2.4 4.3-2.4 3.7 0 5.8 3.9 4.3 7.3C19.5 16.4 12 21 12 21z"/></svg></button>
+    </div>
+    <div class="btnlbl"><span>Not for me</span><span class="s">Maybe</span><span>Keen</span></div>
+    <div class="deckfoot"><button data-undo>↶ Undo</button><button data-skip>Skip →</button></div>
+  </section>
+
+  <!-- 5 transport -->
+  <section class="screen q" data-s="transport">
+    <div class="eyebrow">Getting there</div>
+    <h2>How should we get there and get around?</h2>
+    <p class="lead">Rough whole-trip costs for the three of us.</p>
+    <div class="chips" id="transport">
+      <button class="chip" data-v="Drive our own car + overnight Spirit of Tasmania ferry from Geelong (cheapest, ~$5.4-8.3k, a long drive day each end)">Own car + overnight ferry<small>Cheapest, about $5.4–8.3k. Sleep on the Spirit of Tasmania from Geelong. A long drive day each end.</small></button>
+      <button class="chip" data-v="Fly + campervan (~$5.5-11k, sleep near the sunrise spots, tight for two weeks)">Fly + campervan<small>About $5.5–11k. Wake up next to the sunrise spots. Tight for two weeks.</small></button>
+      <button class="chip" data-v="Fly + hire car + stays (~$6.7-11.3k, a real bed and bathroom every night)">Fly + hire car + stays<small>About $6.7–11.3k. A real bed and bathroom every night.</small></button>
+      <button class="chip" data-v="Don't mind">Don't mind</button>
+    </div>
+    <div class="spacer"></div>
+    <button class="cta" data-next>Next</button>
+  </section>
+
+  <!-- 6 stay -->
+  <section class="screen q" data-s="stay">
+    <div class="eyebrow">Staying</div>
+    <h2>Where would you rather stay?</h2>
+    <div class="chips" id="stay">
+      <button class="chip" data-v="Whole houses / cabins (Airbnb style, kitchen and space)">Whole houses or cabins<small>Airbnb style. Kitchen and space.</small></button>
+      <button class="chip" data-v="Hotels / motels (easy, someone else makes the bed)">Hotels or motels<small>Easy. Someone else makes the bed.</small></button>
+      <button class="chip" data-v="A mix">A mix</button>
+      <button class="chip" data-v="Don't mind">Don't mind</button>
+    </div>
+    <label class="fl">What matters in a place to stay? <span style="font-weight:400;color:var(--ink-faint)">Tick any</span></label>
+    <div class="chips row" id="must">
+      <button class="chip" data-v="Own bedroom for Ayden">Own room for Ayden</button>
+      <button class="chip" data-v="Good wifi">Good wifi</button>
+      <button class="chip" data-v="Washing machine">Washing machine</button>
+      <button class="chip" data-v="Kitchen to cook in">Kitchen</button>
+      <button class="chip" data-v="Pool or spa">Pool or spa</button>
+      <button class="chip" data-v="Walk to food / shops">Walk to food</button>
+      <button class="chip" data-v="A view">A view</button>
+    </div>
+    <input type="text" id="mustOther" placeholder="Something else?">
+    <button class="cta" data-next>Next</button>
+  </section>
+
+  <!-- 7 pace -->
+  <section class="screen q" data-s="pace">
+    <div class="eyebrow">Pace</div>
+    <h2>How much driving a day is OK?</h2>
+    <div class="chips" id="drive">
+      <button class="chip" data-v="As little as possible">As little as possible</button>
+      <button class="chip" data-v="An hour or two">An hour or two</button>
+      <button class="chip" data-v="Long days are fine if the place is worth it">Long days are fine if it's worth it</button>
+    </div>
+    <label class="fl" style="font-family:Fraunces,serif;font-size:22px;margin-top:26px">And the trip overall?</label>
+    <div class="chips" id="pace">
+      <button class="chip" data-v="Mostly relaxed, lots of downtime">Mostly relaxed, lots of downtime</button>
+      <button class="chip" data-v="Mix of busy and quiet days">Mix of busy and quiet days</button>
+      <button class="chip" data-v="Pack it in">Pack it in</button>
+    </div>
+    <div class="spacer"></div>
+    <button class="cta" data-next>Next</button>
+  </section>
+
+  <!-- 8 last bit -->
+  <section class="screen q" data-s="last">
+    <div class="eyebrow">Last bit</div>
+    <h2>Anything we missed?</h2>
+    <label class="fl">The one thing you'd be gutted to miss</label>
+    <input type="text" id="gutted" maxlength="300">
+    <label class="fl">Anywhere else you've heard about?</label>
+    <textarea id="elsewhere" maxlength="2000"></textarea>
+    <label class="fl">Anything else? <span style="font-weight:400;color:var(--ink-faint)">Food, things to avoid, worries, ideas</span></label>
+    <textarea id="notes" maxlength="2000"></textarea>
+    <div class="err" id="sendErr">That didn't go through. Check you've got signal and try again.</div>
+    <button class="cta" id="send">Send to Lyle</button>
+  </section>
+
+  <!-- 9 done -->
+  <section class="screen q" data-s="done">
+    <div class="eyebrow" id="doneHi">Sent</div>
+    <h2>Your top picks</h2>
+    <p class="lead" id="doneLead"></p>
+    <div class="top5" id="top5"></div>
+    <p class="small">Changed your mind? Open this link again and swipe again. Lyle will use your latest go.</p>
+    <div class="credits" id="credits"></div>
+  </section>
+</div>
+
+<script>
+var FORM = 'https://docs.google.com/forms/d/e/1FAIpQLSfv_0NDp_K2oLbqJ7QJapzL5phTdMpFxpOuoe7GLVjdcjqaZg/formResponse';
+var E = {who:'546006946', weeks:'847874002', len:'593522999', elsewhere:'460456201', transport:'865052540', stay:'1860271469', must:'124740905', drive:'354702124', pace:'1821428797', gutted:'688096454', notes:'1519077632'};
+
+var WEEKS = [
+  {v:'Sat 26 Dec - Sat 2 Jan (Christmas / New Year)', label:'26 Dec – 2 Jan', sub:'Christmas / New Year', days:[26,27,28,29,30,31,1,2], start:-6},
+  {v:'Sun 3 Jan - Sat 9 Jan', label:'3 – 9 Jan', days:[3,4,5,6,7,8,9], start:3},
+  {v:'Sun 10 Jan - Sat 16 Jan', label:'10 – 16 Jan', days:[10,11,12,13,14,15,16], start:10},
+  {v:'Sun 17 Jan - Sat 23 Jan', label:'17 – 23 Jan', days:[17,18,19,20,21,22,23], start:17},
+  {v:'Sun 24 Jan - Sun 31 Jan (incl. Australia Day)', label:'24 – 31 Jan', sub:'incl. Australia Day', days:[24,25,26,27,28,29,30,31], start:24}
+];
+
+// d: January day numbers (Dec days as negative: 27 Dec = -4 ... 31 Dec = 0)
+var EVENTS = [
+  {k:'taste', id:'1984748209', name:'Taste of Summer', when:'About 27 Dec – 2 Jan (TBC)', short:'Taste of Summer', d:[-4,-3,-2,-1,0,1,2], blurb:"Hobart's big summer food and music festival on the waterfront, with New Year's Eve fireworks over the harbour.", where:'Hobart waterfront'},
+  {k:'thunder', id:'531675382', name:'Hurricanes v Thunder', when:'Tue 5 Jan, night', short:'Hurricanes v Thunder', d:[5], blurb:'Big Bash cricket under lights at Bellerive.', where:'Ninja Stadium, Bellerive'},
+  {k:'cygnet', id:'1797058414', name:'Cygnet Folk Festival', when:'Fri 8 – Sun 10 Jan', short:'Cygnet Folk Festival', d:[8,9,10], blurb:'Relaxed country-town music festival an hour south of Hobart. Street stalls, dances, buskers.', where:'Huon Valley'},
+  {k:'strikers', id:'1308663050', name:'Hurricanes v Strikers', when:'Sat 9 Jan', short:'Hurricanes v Strikers (Launceston)', d:[9], blurb:"Big Bash cricket at UTAS Stadium, the Hurricanes' one Launceston game this season.", where:'Launceston'},
+  {k:'tennis', id:'1429187736', name:'Hobart International', when:'Week of 11 Jan (days TBC)', short:'Hobart International tennis', d:[11,12,13,14,15,16], blurb:"WTA women's tennis at the Domain, the week before the Australian Open.", where:'Domain Tennis Centre, Hobart'},
+  {k:'sixers', id:'2124682410', name:'Hurricanes v Sixers', when:'Sun 17 Jan, afternoon', short:'Hurricanes v Sixers', d:[17], blurb:'Last Big Bash home game of the season.', where:'Ninja Stadium, Bellerive'},
+  {k:'ausday', id:'1784881847', name:'Australia Day', when:'Tue 26 Jan', short:'Australia Day', d:[26], blurb:'Public holiday. Events around the state; things get busy and booked out.', where:'Statewide'},
+  {k:'festivale', id:'1217455926', name:'Festivale', when:'Fri 29 – Sun 31 Jan', short:'Festivale', d:[29,30,31], blurb:"Northern Tassie's food, wine and live music festival in City Park. Good fit if we finish in Launceston.", where:'Launceston'}
+];
+
+var PLACES = [
+  {k:'portarthur', id:'1827111492', reg:'Tasman Peninsula', name:'Port Arthur', blurb:'Convict ruins on a harbour. The ghost tour at night is a thing.', acc:'Half a day'},
+  {k:'remarkable', id:'1290823624', reg:'Tasman Peninsula', name:'Remarkable Cave', blurb:'A sea cave cut clean through the headland, ocean at both ends.', acc:'15 min boardwalk'},
+  {k:'tessellated', id:'1324949878', reg:'Tasman Peninsula', name:'Tessellated Pavement', blurb:'Rock worn into near-perfect tiles. Best at low tide or sunrise.', acc:'Short flat walk'},
+  {k:'kunanyi', id:'140061288', reg:'Hobart', name:'kunanyi / Mt Wellington', blurb:'Drive to the top for the whole of Hobart below you. Bring a jacket.', acc:'Drive-up'},
+  {k:'mona', id:'1380448182', reg:'Hobart', name:'MONA', blurb:"Hobart's famous (and weird) underground art museum. Get there by ferry.", acc:'Half a day'},
+  {k:'richmond', id:'1878090468', reg:'Near Hobart', name:'Richmond', blurb:"Old village built around Australia's oldest bridge (1823).", acc:'Easy stop'},
+  {k:'neck', id:'335586321', reg:'Bruny Island', name:'The Neck + penguins', blurb:'Climb the boardwalk for the view down the island, stay for penguins at dusk.', acc:'10–15 min climb'},
+  {k:'brunylight', id:'1843347139', reg:'Bruny Island', name:'Cape Bruny Lighthouse', blurb:"Tasmania's second-oldest lighthouse, right on the southern edge.", acc:'Easy walk'},
+  {k:'brunyfood', id:'2004042633', reg:'Bruny Island', name:'Bruny food stops', blurb:'Cheese, oysters, berries and fudge, one shed at a time.', acc:'Drive and eat'},
+  {k:'wineglass', id:'863870053', reg:'East coast', name:'Wineglass Bay Lookout', blurb:'The most photographed view in Tassie. A perfect white curve of sand.', acc:'1–1.5 hr return'},
+  {k:'friendly', id:'1705676800', reg:'East coast', name:'Friendly Beaches', blurb:'Huge empty white beach you can drive straight up to.', acc:'Drive-up'},
+  {k:'bicheno', id:'37513676', reg:'East coast', name:'Bicheno', blurb:'Blowhole by day, penguin tour by night.', acc:'Short flat walk'},
+  {k:'bayoffires', id:'752393084', reg:'East coast', name:'Bay of Fires', blurb:'Orange lichen rocks, turquoise water. Looks fake. Is not.', acc:'Walk-up'},
+  {k:'stcolumba', id:'1568141784', reg:'North-east', name:'St Columba Falls + Pub in the Paddock', blurb:"A 90 m waterfall, then a pub with a beer-drinking pig.", acc:'Easy 1.2 km return'},
+  {k:'cataract', id:'1785866764', reg:'Launceston', name:'Cataract Gorge', blurb:'Chairlift, free pool and peacocks, ten minutes from town.', acc:'10–40 min walks'},
+  {k:'dovelake', id:'1756855239', reg:'Cradle Mountain', name:'Dove Lake', blurb:'The postcard mountain reflected in the lake, on an easy boardwalk loop.', acc:'2 hr loop'},
+  {k:'tamar', id:'1016240032', reg:'Tamar Valley', name:'Tamar Valley', blurb:'Wineries and river drives north of Launceston.', acc:'Drive'},
+  {k:'gordon', id:'802518570', reg:'West coast', name:'Gordon River Cruise', blurb:'Half a day on still water past rainforest and Hells Gates. No walking.', acc:'Half day'},
+  {k:'oceanbeach', id:'1068371813', reg:'West coast', name:'Ocean Beach sunset', blurb:"Tasmania's longest beach, wild and empty, huge sunsets.", acc:'Drive-up'},
+  {k:'ironblow', id:'367003389', reg:'West coast', name:'Iron Blow', blurb:'A flooded old mine gone turquoise among rust-red hills.', acc:'Steps from the car'},
+  {k:'nelson', id:'344641758', reg:'West coast', name:'Nelson Falls', blurb:'Rainforest boardwalk to a waterfall. Good leg-stretch on the drive.', acc:'20 min return'},
+  {k:'family', id:'1104305896', reg:'Extras', name:'Family history stops', blurb:"Queen's Orphan School at New Town, where the family story starts, and a look in the Launceston archives.", acc:'Flexible'},
+  {k:'distillery', id:'164211965', reg:'Extras', name:'A distillery stop', blurb:'Lark in Hobart, McHenry near Port Arthur, or Launceston Distillery.', acc:'Cellar door'},
+  {k:'aboriginal', id:'306355913', reg:'Extras', name:'Aboriginal heritage', blurb:'larapuna (Bay of Fires) and Mount William National Park, with Forester kangaroos.', acc:'Short walks'}
+];
+
+var CRED = {"taste":["Jorge Láscar","CC BY 2.0","Lascar_Constitution_Dock_(Hobart)_(4551798599).jpg"],"thunder":["Christopher Neugebauer","CC BY-SA 2.0","One-day_Cricket_Australia_vs_England,_Bellerive_Oval,_January_2011_(2).jpg"],"cygnet":["Tony 1212","CC BY 4.0","Cygnet-87-melia%2Bmaher%2Bmcauslan.jpg"],"strikers":["Aaroncrick","CC BY-SA 3.0","Stand_at_Aurora_Stadium.JPG"],"tennis":["WDM10","CC BY-SA 4.0","Domain_Tennis_Centre.jpg"],"sixers":["Jgritz","CC BY 2.0","Bellerive_oval_hobart.jpg"],"ausday":["wlcutler","CC BY 2.0","Hobart_Wharfchancellor.jpg"],"festivale":["Owen Allen","CC BY 2.0","TasTrip_(557)_Launceston_City_Park_2012.jpg"],"portarthur":["Pacificwizard","CC0","Port_Arthur_Penitentiary,_June_2026_-_Tasmania.jpg"],"remarkable":["Mooonrise","CC BY-SA 4.0","Remarkable_Cave,_Tasman_National_Park,_Tasmania.jpg"],"tessellated":["JJ Harrison","CC BY-SA 2.5","Tessellated_Pavement_Sunrise_Landscape.jpg"],"kunanyi":["Salonee-2021","CC BY-SA 4.0","Viewing_Platform_Mount_Wellington_Hobart_Tasmania.jpg"],"mona":["Barrylb","CC0","MONA_1.jpg"],"richmond":["aussiejeff","CC BY-SA 2.0","Richmond_Bridge,_Tasmania_(11376489996).jpg"],"neck":["Chuq","CC BY-SA 4.0","South_view_from_The_Neck_lookout,_Bruny_Island,_Tasmania_01.jpg"],"brunylight":["Steven Penton","CC BY 2.0","Cape_Bruny_Lighthouse_(30765250005).jpg"],"brunyfood":["jacobharrisau","CC BY-SA 2.0","Adventure_Bay,_Bruny_Island,_Tasmania.jpg"],"wineglass":["Diego Delso","CC BY-SA 3.0","Freycinet-Tasmania-Australia03.JPG"],"friendly":["HilACT","CC BY-SA 4.0","South_Friendlies_Beach_Freycinet_National_Park.jpg"],"bicheno":["Gary Houston","CC0","Bicheno_Blowhole_Tasmania_20190725-027.jpg"],"bayoffires":["Diego Delso","CC BY-SA 3.0","Bay_of_Fires-15.jpg"],"stcolumba":["Diego Delso","CC BY-SA 3.0","Columba_Falls-Tasmania-Australia02.JPG"],"cataract":["Jorge Láscar","CC BY 2.0","Lascar_Swimming_pool_,_chairlift,_First_Basin_and_suspension_bridge_-_Cataract_Gorge_(Launceston)_(4552506880).jpg"],"dovelake":["Thennicke","CC BY-SA 4.0","Boat_shed_and_Cradle_Mountain_at_Dove_Lake,_Tas.jpg"],"tamar":["Unknown","Public domain","Tamarridge_(www.tamarpulpmill.info).jpg"],"gordon":["Dwaipayanbasu85","CC BY-SA 4.0","Gordon_RIver_Mangroves.jpg"],"oceanbeach":["JarrahTree","CC BY 2.5 AU","OceanBeachwest_from_air.jpg"],"ironblow":["Thomas & Olivia Williams","CC BY 2.0","Iron_Blow_Lookout_near_Queenstown,_March_2019_(47581542612).jpg"],"nelson":["Ankitsinha1986","CC BY-SA 4.0","Nelson_Falls_Tasmania.jpg"],"family":["SurveyorMJF","CC BY-SA 4.0","St_Johns_Anglican_New_Town.jpg"],"distillery":["Sullivans Cove Distillery","CC BY-SA 4.0","SULLIVANS-COVE-MAY17-natalie-mendham-photography-144.jpg"],"aboriginal":["Eli Duke","CC BY-SA 2.0","Tasmania_Sunset_at_Mt._William_National_Park.jpg"]};
+function credUrl(k){return 'https://commons.wikimedia.org/wiki/File:'+CRED[k][2];}
+
+/* ---------- state ---------- */
+var KEY='tassie-swipe-v1';
+var st={who:'',whoOther:'',weeks:[],len:'',ev:{},pl:{},evOrder:[],plOrder:[],transport:'',stay:'',must:[],mustOther:'',drive:'',pace:'',gutted:'',elsewhere:'',notes:'',screen:0};
+try{var saved=JSON.parse(localStorage.getItem(KEY)||'null'); if(saved&&!saved.sent){for(var s in saved) st[s]=saved[s];}}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}}
+
+var screens=[].slice.call(document.querySelectorAll('.screen'));
+var NAMES=screens.map(function(s){return s.dataset.s});
+var cur=0;
+function go(i){
+  screens[cur].classList.remove('on'); cur=i; screens[cur].classList.add('on');
+  st.screen=i; save();
+  document.getElementById('back').classList.toggle('show', i>0 && NAMES[i]!=='done');
+  var p=(NAMES[i]==='events')?2+st.evOrder.length/EVENTS.length:(NAMES[i]==='places')?3+st.plOrder.length/PLACES.length:i;
+  document.getElementById('prog').style.width=Math.min(100,p/(screens.length-1)*100)+'%';
+  window.scrollTo(0,0);
+  if(NAMES[i]==='events') evDeck.render(); if(NAMES[i]==='places') plDeck.render();
+}
+document.getElementById('back').onclick=function(){
+  if(cur<=0) return;
+  var d=NAMES[cur]==='events'?evDeck:NAMES[cur]==='places'?plDeck:null;
+  if(d && d.order.length){ d.undo(); return; }          // back inside a deck = undo last card
+  var prev=NAMES[cur-1], pd=prev==='events'?evDeck:prev==='places'?plDeck:null;
+  if(pd && pd.order.length>=pd.items.length){ var k=pd.order.pop(); delete pd.ans[k]; save(); }  // reopen last card of a finished deck
+  go(cur-1);
+};
+[].forEach.call(document.querySelectorAll('[data-next]'),function(b){ b.onclick=function(){ go(cur+1); }; });
+
+/* ---------- chips ---------- */
+function single(id,key,after){
+  var box=document.getElementById(id);
+  [].forEach.call(box.children,function(c){
+    if(c.dataset.v===st[key]) c.classList.add('sel');
+    c.onclick=function(){ [].forEach.call(box.children,function(x){x.classList.remove('sel')}); c.classList.add('sel'); st[key]=c.dataset.v; save(); if(after) after(); };
+  });
+}
+function multi(id,key){
+  var box=document.getElementById(id);
+  [].forEach.call(box.children,function(c){
+    if(st[key].indexOf(c.dataset.v)>-1) c.classList.add('sel');
+    c.onclick=function(){ var a=st[key], i=a.indexOf(c.dataset.v); if(i>-1){a.splice(i,1);c.classList.remove('sel')}else{a.push(c.dataset.v);c.classList.add('sel')} save(); };
+  });
+}
+function bindText(id,key){ var el=document.getElementById(id); el.value=st[key]||''; el.oninput=function(){ st[key]=el.value; save(); if(key==='whoOther') whoCheck(); }; }
+
+function whoCheck(){
+  if(st.whoOther.trim()){ [].forEach.call(document.getElementById('who').children,function(x){x.classList.remove('sel')}); st.who=''; }
+  document.getElementById('whoNext').disabled=!(st.who||st.whoOther.trim());
+}
+single('who','who',function(){ st.whoOther=''; document.getElementById('whoOther').value=''; save(); whoCheck(); });
+bindText('whoOther','whoOther'); whoCheck();
+single('len','len'); single('transport','transport'); single('stay','stay'); single('drive','drive'); single('pace','pace');
+multi('must','must'); bindText('mustOther','mustOther');
+bindText('gutted','gutted'); bindText('elsewhere','elsewhere'); bindText('notes','notes');
+
+/* ---------- timeline ---------- */
+(function(){
+  var tl=document.getElementById('tl');
+  WEEKS.forEach(function(w){
+    var b=document.createElement('button'); b.className='wk'+(st.weeks.indexOf(w.v)>-1?' sel':'');
+    var evs=EVENTS.filter(function(e){ return e.d.some(function(x){ return w.days.some(function(dd,i){ return weekDay(w,i)===x; }); }); });
+    var cells=w.days.map(function(dd,i){ var x=weekDay(w,i); var on=EVENTS.some(function(e){return e.d.indexOf(x)>-1}); return '<div class="d'+(on?' ev':'')+'">'+dd+'</div>'; }).join('');
+    b.innerHTML='<div class="wh"><span>'+w.label+(w.sub?' <span style="font-weight:400;color:var(--ink-faint);font-size:13px">· '+w.sub+'</span>':'')+'</span><span class="tick">✓</span></div>'+
+      '<div class="days" style="grid-template-columns:repeat('+w.days.length+',1fr)">'+cells+'</div>'+
+      (evs.length?'<div class="evs">'+evs.map(function(e){return '<b>●</b> '+e.short}).join(' &nbsp; ')+'</div>':'');
+    b.onclick=function(){ var i=st.weeks.indexOf(w.v); if(i>-1){st.weeks.splice(i,1);b.classList.remove('sel')}else{st.weeks.push(w.v);b.classList.add('sel')} save(); wkCheck(); };
+    tl.appendChild(b);
+  });
+  function weekDay(w,i){ var dd=w.days[i]; return (w.start<0 && dd>20)? dd-31 : dd; }
+  function wkCheck(){ document.getElementById('weeksNext').disabled=!st.weeks.length; }
+  wkCheck();
+})();
+
+/* ---------- decks ---------- */
+function Deck(elId,countId,items,ansKey,orderKey,isEvent){
+  this.el=document.getElementById(elId); this.countEl=document.getElementById(countId);
+  this.items=items; this.ans=st[ansKey]; this.order=st[orderKey]; this.isEvent=isEvent;
+  var self=this, sec=this.el.closest('.screen');
+  [].forEach.call(sec.querySelectorAll('.rb'),function(b){ b.onclick=function(){ self.decide(b.dataset.r,true); }; });
+  sec.querySelector('[data-undo]').onclick=function(){ self.undo(); };
+  sec.querySelector('[data-skip]').onclick=function(){ self.decide('',true); };
+}
+Deck.prototype.idx=function(){ return this.order.length; };
+Deck.prototype.cardHTML=function(it){
+  var c=CRED[it.k];
+  var tag=this.isEvent?'<span class="tag">'+it.when+'</span>':'<span class="tag reg">'+it.reg+'</span>';
+  var acc=this.isEvent?it.where:it.acc;
+  return '<a class="cred" href="'+credUrl(it.k)+'" target="_blank" rel="noopener">Photo: '+c[0]+' · '+c[1]+'</a>'+
+    '<div class="stamp k">KEEN</div><div class="stamp n">NAH</div><div class="stamp m">MAYBE</div>'+
+    '<div class="ct">'+tag+'<h3>'+it.name+'</h3><p>'+it.blurb+'</p><div class="acc">'+acc+'</div></div>';
+};
+Deck.prototype.render=function(){
+  var i=this.idx(), self=this; this.el.innerHTML='';
+  this.countEl.textContent=Math.min(i+1,this.items.length)+' of '+this.items.length;
+  if(i>=this.items.length){ go(cur+1); return; }
+  [i+1,i].forEach(function(j){
+    if(j>=self.items.length) return;
+    var it=self.items[j], d=document.createElement('div');
+    d.className='card'+(j>i?' behind':''); d.style.backgroundImage='url(img/'+it.k+'.jpg)';
+    d.innerHTML=self.cardHTML(it); self.el.appendChild(d);
+    if(j===i){ self.top=d; self.drag(d); }
+  });
+  if(this.items[i+2]){ var pre=new Image(); pre.src='img/'+this.items[i+2].k+'.jpg'; }
+};
+Deck.prototype.drag=function(card){
+  var self=this, sx=0, sy=0, dx=0, dy=0, down=false;
+  var k=card.querySelector('.stamp.k'), n=card.querySelector('.stamp.n'), m=card.querySelector('.stamp.m');
+  card.addEventListener('pointerdown',function(e){ if(e.target.closest('a')) return; down=true; sx=e.clientX; sy=e.clientY; card.setPointerCapture(e.pointerId); card.style.transition='none'; card.style.cursor='grabbing'; });
+  card.addEventListener('pointermove',function(e){ if(!down) return; dx=e.clientX-sx; dy=e.clientY-sy;
+    card.style.transform='translate('+dx+'px,'+dy+'px) rotate('+(dx/14)+'deg)';
+    k.style.opacity=Math.max(0,Math.min(1,dx/90)); n.style.opacity=Math.max(0,Math.min(1,-dx/90)); m.style.opacity=(Math.abs(dx)<70)?Math.max(0,Math.min(1,-dy/90)):0; });
+  function up(){ if(!down) return; down=false; card.style.cursor='';
+    var r=''; if(dx>100) r='Keen'; else if(dx<-100) r='Not for me'; else if(dy<-110 && Math.abs(dx)<90) r='Maybe';
+    if(r){ self.decide(r,false,dx,dy); }
+    else{ card.style.transition='transform .25s ease'; card.style.transform=''; k.style.opacity=n.style.opacity=m.style.opacity=0; }
+    dx=dy=0; }
+  card.addEventListener('pointerup',up); card.addEventListener('pointercancel',up);
+};
+Deck.prototype.decide=function(r,fromBtn,dx,dy){
+  var i=this.idx(); if(i>=this.items.length) return;
+  var it=this.items[i], card=this.top, self=this;
+  if(r) this.ans[it.k]=r; else delete this.ans[it.k];
+  this.order.push(it.k); save();
+  if(card){
+    var tx=r==='Keen'?600:r==='Not for me'?-600:0, ty=r==='Maybe'?-800:(r?(dy||0)*1.5:0);
+    if(!r){ tx=0; ty=0; }
+    if(fromBtn&&r){ var s=card.querySelector(r==='Keen'?'.stamp.k':r==='Maybe'?'.stamp.m':'.stamp.n'); if(s) s.style.opacity=1; }
+    card.style.transition='transform .32s ease, opacity .32s ease';
+    card.style.transform= r?'translate('+tx+'px,'+ty+'px) rotate('+(tx/20)+'deg)':'scale(.9)';
+    card.style.opacity=0;
+  }
+  setTimeout(function(){ self.render(); go(cur); }, 260);
+};
+Deck.prototype.undo=function(){ if(!this.order.length) return; var k=this.order.pop(); delete this.ans[k]; save(); this.render(); go(cur); };
+
+var evDeck=new Deck('evDeck','evCount',EVENTS,'ev','evOrder',true);
+var plDeck=new Deck('plDeck','plCount',PLACES,'pl','plOrder',false);
+document.addEventListener('keydown',function(e){
+  var d=NAMES[cur]==='events'?evDeck:NAMES[cur]==='places'?plDeck:null; if(!d||/INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
+  if(e.key==='ArrowRight') d.decide('Keen',true); else if(e.key==='ArrowLeft') d.decide('Not for me',true); else if(e.key==='ArrowUp') d.decide('Maybe',true);
+});
+
+/* ---------- send ---------- */
+document.getElementById('send').onclick=function(){
+  var btn=this, err=document.getElementById('sendErr'); err.style.display='none';
+  var p=new URLSearchParams();
+  if(st.whoOther.trim()){ p.append('entry.'+E.who,'__other_option__'); p.append('entry.'+E.who+'.other_option_response',st.whoOther.trim()); }
+  else p.append('entry.'+E.who,st.who);
+  st.weeks.forEach(function(w){ p.append('entry.'+E.weeks,w); });
+  function add(key,val){ if(val) p.append('entry.'+E[key],val); }
+  add('len',st.len);
+  EVENTS.forEach(function(e){ if(st.ev[e.k]) p.append('entry.'+e.id,st.ev[e.k]); });
+  PLACES.forEach(function(x){ if(st.pl[x.k]) p.append('entry.'+x.id,st.pl[x.k]); });
+  add('elsewhere',st.elsewhere.trim()); add('transport',st.transport); add('stay',st.stay);
+  st.must.forEach(function(m){ p.append('entry.'+E.must,m); });
+  if(st.mustOther.trim()){ p.append('entry.'+E.must,'__other_option__'); p.append('entry.'+E.must+'.other_option_response',st.mustOther.trim()); }
+  add('drive',st.drive); add('pace',st.pace); add('gutted',st.gutted.trim()); add('notes',st.notes.trim());
+  p.append('pageHistory','0,1,2,3,4,5');
+  btn.disabled=true; btn.textContent='Sending…';
+  fetch(FORM,{method:'POST',mode:'no-cors',body:p}).then(function(){
+    st.sent=true; save(); showDone();
+  }).catch(function(){ err.style.display='block'; btn.disabled=false; btn.textContent='Send to Lyle'; });
+};
+
+function showDone(){
+  var name=st.whoOther.trim()||st.who;
+  document.getElementById('doneHi').textContent='Sent. Thanks'+(name?', '+name:'')+'!';
+  var all=EVENTS.map(function(e){return {it:e,r:st.ev[e.k],ev:true}}).concat(PLACES.map(function(x){return {it:x,r:st.pl[x.k],ev:false}}));
+  var keen=all.filter(function(a){return a.r==='Keen'}), maybe=all.filter(function(a){return a.r==='Maybe'});
+  var top=keen.concat(maybe).slice(0,5);
+  document.getElementById('doneLead').textContent= keen.length? 'You were keen on '+keen.length+' thing'+(keen.length>1?'s':'')+'. Here are the first five.' : (maybe.length?'Nothing was a hard yes, but these were maybes.':'You were hard to impress. Lyle will plan around the weeks you picked.');
+  document.getElementById('top5').innerHTML=top.map(function(a,i){ return '<div class="t5"><div class="n">'+(i+1)+'</div><div class="ph" style="background-image:url(img/'+a.it.k+'.jpg)"></div><div><b>'+a.it.name+'</b><span>'+(a.ev?a.it.when:a.it.reg)+(a.r==='Maybe'?' · maybe':'')+'</span></div></div>'; }).join('');
+  document.getElementById('credits').innerHTML='Photos from Wikimedia Commons: '+Object.keys(CRED).map(function(k){var c=CRED[k];return '<a href="'+credUrl(k)+'" target="_blank" rel="noopener">'+c[0]+'</a> ('+c[1]+')';}).join(', ')+'.';
+  try{ localStorage.removeItem(KEY); }catch(e){}
+  go(NAMES.indexOf('done'));
+}
+
+/* resume */
+if(st.screen && st.screen<NAMES.indexOf('done')) go(st.screen);
+</script>
+</body>
+</html>
